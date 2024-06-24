@@ -1,0 +1,10 @@
+.footer {
+  color: var(--color-grey-05);
+  padding: 1rem 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .footer {
+    color: var(--color-grey-06);
+  }
+}

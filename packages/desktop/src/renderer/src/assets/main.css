@@ -1,0 +1,104 @@
+@import './base.css';
+@import './elements/checkbox.css';
+@import './elements/input.css';
+@import './elements/button.css';
+
+html,
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+  -webkit-user-drag: none;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -1000 !important;
+}
+
+.title-bar {
+  height: 3rem;
+  line-height: 2rem;
+  -webkit-app-region: drag;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+h3 {
+  font-size: 1rem;
+  padding: 0;
+  margin: 0;
+}
+
+strong {
+  font-weight: bold;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.float-right {
+  float: right;
+}
+
+.float-left {
+  float: left;
+}
+
+.monospace {
+  font-family: 'Iosevka Fixed Extended', 'Courier New', monospace;
+}
+
+.monospace-slab {
+  font-family: 'Iosevka Fixed Slab Extended', 'Courier New', monospace;
+}
+
+.monospace.strong,
+.monospace-slab.strong {
+  font-weight: 700;
+}
+
+.monospace.lucida,
+.monospace-slab.lucida {
+  font-feature-settings: 'ss13' 1;
+}
+
+@media (max-width: 720px) {
+}
+
+@media (max-width: 620px) {
+}
+
+@media (max-width: 350px) {
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body,
+  #root {
+    color: var(--color-text-light);
+    background: var(--color-background-dark);
+  }
+}

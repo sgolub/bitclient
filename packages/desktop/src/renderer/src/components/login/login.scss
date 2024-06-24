@@ -1,0 +1,206 @@
+.server-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 16rem;
+  margin-top: 1rem;
+}
+
+.server-list li {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.server-list li button {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  background: var(--color-grey-03);
+  transition: 0.2s;
+  outline: solid 0 var(--color-primary-25);
+  border: solid 1px transparent;
+  transition: all 0.15s ease;
+}
+
+.server-list li button:focus {
+  border: solid 1px var(--color-blue-dark);
+  outline-width: 0.25rem;
+}
+
+.server-list li button .btn-content {
+  flex: 1;
+  padding: 0 0.25rem;
+}
+
+.server-list li button label {
+  display: block;
+  cursor: pointer;
+  font-size: 1.4rem;
+}
+
+.server-list li button small {
+  display: block;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--color-grey-06);
+}
+
+.server-list li button .icon {
+  height: 2.2rem;
+  border-radius: 0.25rem;
+}
+
+.server-list li button:hover {
+  background: var(--color-primary-50);
+}
+
+.form-container {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.form-container .form-row {
+  padding-bottom: 1rem;
+}
+
+.form-container .form-row.toggle-control {
+  display: flex;
+  align-items: center;
+}
+
+.form-container .form-row.toggle-control label {
+  cursor: pointer;
+  flex: 1;
+}
+
+.form-container .form-row button[type='submit'],
+.form-container .form-row button.loading {
+  width: 100%;
+}
+
+.form-container .logo {
+  width: 6rem;
+  margin-bottom: 1rem;
+}
+
+.form-container .login-form {
+  width: 18rem;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+.loading-spinner {
+  height: 1rem;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+  fill: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .server-list li button {
+    background: var(--color-grey-07);
+  }
+  .server-list li button label {
+    color: var(--color-text-light);
+  }
+  .server-list li button small {
+    color: var(--color-grey-05);
+  }
+  .server-list li button:hover {
+    background: var(--color-primary-75);
+  }
+  .server-list li button {
+    outline-color: var(--color-primary-50);
+  }
+}
+
+/* .form-container .form {
+  display: block;
+  padding: 0;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  width: 15rem;
+}
+
+.form-container .form-control {
+  padding: 0 0 0.5rem 0;
+}
+
+.form-container .form-control label {
+  font-size: 1rem;
+  font-weight: bold;
+  display: block;
+  padding-bottom: 0.5rem;
+}
+
+.form-container .form-control input[type='email'],
+.form-container .form-control input[type='password'] {
+  width: 100%;
+  height: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.1rem;
+  border-radius: 0.25rem;
+  border: solid 1px var(--color-black);
+  outline: none;
+  padding: 0 0.5rem;
+  transition: all 0.15s ease;
+  outline: solid 0 transparent;
+}
+
+.form-container .form-control input[type='email']:focus,
+.form-container .form-control input[type='email']:active,
+.form-container .form-control input[type='password']:focus,
+.form-container .form-control input[type='password']:active {
+  border-color: var(--color-primary);
+  outline: solid 0.25rem var(--color-primary-25);
+}
+
+.form-container .form-control input[type='email'].invalid,
+.form-container .form-control input[type='password'].invalid {
+  border-color: var(--color-red);
+}
+
+.form-container .form-control input[type='email'].invalid:focus,
+.form-container .form-control input[type='email'].invalid:active,
+.form-container .form-control input[type='password'].invalid:focus,
+.form-container .form-control input[type='password'].invalid:active {
+  border-color: var(--color-red);
+  outline: solid 0.25rem var(--color-red-25);
+}
+
+.form-container .login-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 0 0 1rem 0;
+  transition: all 0.5s ease;
+  border: solid 0.2rem var(--color-primary);
+  box-shadow: 0 0.5rem 2rem var(--color-primary-50);
+}
+
+.form-container .login-avatar:hover {
+  box-shadow: 0 0.5rem 2rem var(--color-primary-90);
+}
+
+.form-container .logo {
+  width: 8rem;
+} */

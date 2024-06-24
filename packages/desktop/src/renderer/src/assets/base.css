@@ -1,0 +1,157 @@
+@font-face {
+  font-family: 'Iosevka Fixed Slab Extended';
+  src: url('./fonts/IosevkaFixedSlab-Extended.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 400;
+  font-stretch: expanded;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Iosevka Fixed Slab Extended';
+  src: url('./fonts/IosevkaFixedSlab-ExtendedBold.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 700;
+  font-stretch: expanded;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Iosevka Fixed Extended';
+  src: url('./fonts/IosevkaFixed-Extended.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 400;
+  font-stretch: expanded;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Iosevka Fixed Extended';
+  src: url('./fonts/IosevkaFixed-ExtendedBold.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 700;
+  font-stretch: expanded;
+  font-style: normal;
+}
+
+:root {
+  /* --ev-c-white: #ffffff;
+  --ev-c-white-soft: #f8f8f8;
+  --ev-c-white-mute: #f2f2f2;
+
+  --ev-c-black: #1b1b1f;
+  --ev-c-black-soft: #222222;
+  --ev-c-black-mute: #282828;
+
+  --ev-c-gray-1: #515c67;
+  --ev-c-gray-2: #414853;
+  --ev-c-gray-3: #32363f; */
+
+  --color-grey-01: #f8f9fa;
+  --color-grey-02: #e9ecef;
+  --color-grey-03: #dee2e6;
+  --color-grey-04: #ced4da;
+  --color-grey-05: #adb5bd;
+  --color-grey-06: #6c757d;
+  --color-grey-07: #495057;
+  --color-grey-08: #343a40;
+  --color-grey-09: #212529;
+  --color-grey-10: #0d0e10;
+
+  --color-yellow: #ffbe0b;
+  --color-yellow-2: #ffdf88;
+  --color-orange: #fb5607;
+  --color-red: rgb(255, 0, 110);
+  --color-purple: #8338ec;
+  --color-blue: #3a86ff;
+  --color-blue-dark: #1b72ff;
+  --color-green: #06d6a0;
+}
+
+:root {
+  /* --color-white: var(--color-grey-01); */
+  --color-white: #ffffff;
+  --color-black: var(--color-grey-09);
+
+  --color-background: var(--color-grey-02);
+  --color-background-dark: var(--color-grey-08);
+
+  --color-text: var(--color-grey-09);
+  --color-text-light: var(--color-grey-02);
+
+  --color-primary: var(--color-blue);
+  --color-primary-90: rgba(58, 134, 255, 0.9);
+  --color-primary-75: rgba(58, 134, 255, 0.75);
+  --color-primary-50: rgba(58, 134, 255, 0.5);
+  --color-primary-25: rgba(58, 134, 255, 0.25);
+
+  --color-invalid: var(--color-red);
+  --color-invalid-90: rgba(255, 0, 110, 0.9);
+  --color-invalid-75: rgba(255, 0, 110, 0.75);
+  --color-invalid-50: rgba(255, 0, 110, 0.5);
+  --color-invalid-25: rgba(255, 0, 110, 0.25);
+
+  /* --color-gray: rgb(206, 212, 220);
+  --color-gray-light: rgb(240, 240, 240);
+  --color-red: rgb(220, 23, 93);
+  --color-red-25: rgba(220, 23, 93, 0.25); */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+  -webkit-user-drag: none;
+}
+
+::-webkit-scrollbar {
+  height: 0.25rem;
+  width: 0.25rem;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-grey-05);
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-grey-07);
+  }
+}
+
+::selection {
+  color: var(--color-white);
+  background: var(--color-primary);
+}
+
+body {
+  font-size: 16px;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+body.loading {
+  cursor: wait;
+}
+
+body.loading > main {
+  pointer-events: none;
+}
+
+body.blur > main {
+  transition: 0.2s filter ease-in-out;
+  filter: blur(0.5rem);
+}

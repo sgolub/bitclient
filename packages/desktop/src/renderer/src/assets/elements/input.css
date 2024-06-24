@@ -1,0 +1,106 @@
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='search'],
+input[type='tel'],
+input[type='url'],
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'],
+input[type='month'],
+input[type='week'] {
+  width: 100%;
+  appearance: none;
+  border-radius: 0.25rem;
+  border-style: solid;
+  border-width: 0.1rem;
+  border-color: var(--color-grey-40);
+  background-color: var(--color-white);
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--color-text);
+  transition: all 0.1s linear;
+  -webkit-app-region: no-drag;
+  -webkit-user-drag: none;
+}
+
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+input[type='search']:focus,
+input[type='tel']:focus,
+input[type='url']:focus,
+input[type='date']:focus,
+input[type='time']:focus,
+input[type='datetime-local']:focus,
+input[type='month']:focus,
+input[type='week']:focus {
+  border-color: var(--color-primary);
+  outline: solid 0.25rem var(--color-primary-25);
+}
+
+input[type='text'].invalid,
+input[type='email'].invalid,
+input[type='password'].invalid,
+input[type='number'].invalid,
+input[type='search'].invalid,
+input[type='tel'].invalid,
+input[type='url'].invalid,
+input[type='date'].invalid,
+input[type='time'].invalid,
+input[type='datetime-local'].invalid,
+input[type='month'].invalid,
+input[type='week'].invalid {
+  border-color: var(--color-red);
+}
+
+input[type='text']:focus.invalid,
+input[type='email']:focus.invalid,
+input[type='password']:focus.invalid,
+input[type='number']:focus.invalid,
+input[type='search']:focus.invalid,
+input[type='tel']:focus.invalid,
+input[type='url']:focus.invalid,
+input[type='date']:focus.invalid,
+input[type='time']:focus.invalid,
+input[type='datetime-local']:focus.invalid,
+input[type='month']:focus.invalid,
+input[type='week']:focus.invalid {
+  border-color: var(--color-invalid);
+  outline: solid 0.25rem var(--color-invalid-25);
+}
+
+@media (prefers-color-scheme: dark) {
+  input[type='text']:focus,
+  input[type='email']:focus,
+  input[type='password']:focus,
+  input[type='number']:focus,
+  input[type='search']:focus,
+  input[type='tel']:focus,
+  input[type='url']:focus,
+  input[type='date']:focus,
+  input[type='time']:focus,
+  input[type='datetime-local']:focus,
+  input[type='month']:focus,
+  input[type='week']:focus {
+    outline-color: var(--color-primary-50);
+  }
+
+  input[type='text']:focus.invalid,
+  input[type='email']:focus.invalid,
+  input[type='password']:focus.invalid,
+  input[type='number']:focus.invalid,
+  input[type='search']:focus.invalid,
+  input[type='tel']:focus.invalid,
+  input[type='url']:focus.invalid,
+  input[type='date']:focus.invalid,
+  input[type='time']:focus.invalid,
+  input[type='datetime-local']:focus.invalid,
+  input[type='month']:focus.invalid,
+  input[type='week']:focus.invalid {
+    outline: solid 0.25rem var(--color-invalid-50);
+  }
+}

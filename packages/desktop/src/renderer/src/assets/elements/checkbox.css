@@ -1,0 +1,66 @@
+input[type='checkbox'].toggle {
+  appearance: none;
+  background-color: var(--color-grey-05);
+  border: none;
+  outline: none;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 1.6rem;
+  border-radius: 0.8rem;
+  margin: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+input[type='checkbox'].toggle::before {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: -0.5rem;
+  right: -0.5rem;
+  top: -0.5rem;
+}
+
+input[type='checkbox'].toggle,
+input[type='checkbox'].toggle::after {
+  transition: all 0.2s ease-in-out;
+}
+
+input[type='checkbox'].toggle::after {
+  background-color: var(--color-white);
+  content: '';
+  width: 1.4rem;
+  height: 1.4rem;
+  left: 0.1rem;
+  position: absolute;
+  top: 0.1rem;
+  border-radius: 0.8rem;
+}
+
+input[type='checkbox'].toggle:read-only {
+  cursor: inherit;
+  transition-duration: 0ms;
+}
+
+input[type='checkbox'].toggle:checked:read-only:hover {
+  background-color: var(--color-primary);
+}
+
+/* input[type='checkbox'].toggle:hover, */
+input[type='checkbox'].toggle:focus {
+  transition: all 0.1s linear;
+  box-shadow: 0 0 0 0.25rem var(--color-primary-50);
+}
+
+input[type='checkbox'].toggle:checked {
+  background-color: var(--color-primary);
+}
+
+input[type='checkbox'].toggle:checked:hover {
+  background-color: var(--color-blue-dark);
+}
+
+input[type='checkbox'].toggle:checked::after {
+  background-color: var(--color-white);
+  left: 1.5rem;
+}

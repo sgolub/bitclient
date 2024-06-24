@@ -1,0 +1,81 @@
+.vault-container {
+  height: 100vh;
+  width: 100vw;
+  flex: 1;
+  display: flex;
+}
+
+.vault {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.vault-content {
+  flex: 1;
+  display: flex;
+  align-content: stretch;
+  overflow: hidden;
+}
+
+.cipher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cipher-icon {
+  margin-right: 1rem;
+}
+
+.cipher-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  h3 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-grey-05);
+  }
+}
+
+.cipher-content {
+  flex: 1 1 auto;
+  background: var(--color-white);
+  overflow: auto;
+}
+
+.cipher-content-inner,
+.cipher-content-footer {
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .cipher-name small {
+    color: var(--color-grey-06);
+  }
+
+  .search-container {
+    // background: var(--color-grey-10);
+    // border-color: var(--color-grey-08);
+    background: transparent;
+    border-color: #000000;
+    input {
+      background: var(--color-grey-09);
+      border-color: var(--color-grey-10);
+      color: var(--color-text-light);
+    }
+    input:focus {
+      outline: solid 0.25rem var(--color-primary-50);
+    }
+  }
+
+  .cipher-content {
+    background: transparent;
+  }
+}

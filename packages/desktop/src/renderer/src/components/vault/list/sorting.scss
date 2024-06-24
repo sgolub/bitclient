@@ -1,0 +1,46 @@
+.sorting-dropdown {
+  cursor: default;
+  .sorting-value {
+    cursor: default;
+    a {
+      display: flex;
+      // align-items: space-between;
+      cursor: pointer;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      align-items: center;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      transition: all 0.15s ease;
+      height: 2rem;
+      text-decoration: none;
+      color: var(--color-text);
+      outline: none;
+      font-weight: normal;
+      &:hover {
+        background: var(--color-primary-25);
+      }
+      label {
+        cursor: pointer;
+        flex: 1;
+        margin-right: 0.5rem;
+      }
+
+      .icon-check {
+        cursor: pointer;
+        height: 1.25rem;
+        fill: var(--color-primary);
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .sorting-dropdown {
+    background: var(--color-grey-09);
+    a label {
+      color: var(--color-text-light);
+    }
+  }
+}
