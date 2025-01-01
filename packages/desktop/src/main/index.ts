@@ -15,8 +15,6 @@ log.transports.console.level = is.dev ? 'debug' : 'info';
 const BACKGROUNDCOLOR_DARK = '#343a40';
 const BACKGROUNDCOLOR_LIGHT = '#e9ecef';
 
-nativeTheme.themeSource = 'dark';
-
 const isMac = process.platform === 'darwin';
 
 function createWindow(): BrowserWindow {

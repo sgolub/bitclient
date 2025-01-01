@@ -1,12 +1,10 @@
 {
   "name": "bitclient",
   "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "Bitclient is an alternative client for the Bitwarden® platform.",
   "keywords": [],
-  "author": "sgolub",
+  "author": "Sergey Golub <sergeyglb@outlook.com> (https://sergey.gl)",
+  "repository": "https://github.com/sgolub/bitclient",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
