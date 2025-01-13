@@ -1,7 +1,7 @@
 import { KeysModel } from '../../models/Keys';
 import { CipherModel, VaultModel } from '../../models/Vault';
 import { CardType, CipherType, CustomFieldType } from '../../types/vault';
-import { AesCbc128_HmacSha256, AesCbc256, AesCbc256_HmacSha256 } from './aes';
+import { AesCbc128_HmacSha256, AesCbc256_HmacSha256 } from './aes';
 import {
   Rsa2048_OaepSha1,
   Rsa2048_OaepSha1_HmacSha256,
@@ -124,75 +124,32 @@ export async function decrypt_string(value: string, key: Uint8Array): Promise<st
 }
 
 export async function decrypt(value: string, key: Uint8Array): Promise<Uint8Array> {
-  const [encType] = value.split('.');
+  const [encType, encData] = value.split('.');
   const encKey = key.slice(0, 32);
   const macKey = key.slice(32, 64);
 
+  let iv, ct, mac;
   switch (Number(encType)) {
     case 0:
-      const [, [iv_AesCbc256, ct_AesCbc256]] = value.split('.').map((x) => x.split('|'));
-      return await AesCbc256({ iv: iv_AesCbc256, ct: ct_AesCbc256 }, encKey);
+      throw new Error(`Encryption type is not supported`);
     case 1:
-      const [, [iv_AesCbc128_HmacSha256, ct_AesCbc128_HmacSha256, mac_AesCbc128_HmacSha256]] = value
-        .split('.')
-        .map((x) => x.split('|'));
-
-      return await AesCbc128_HmacSha256(
-        { iv: iv_AesCbc128_HmacSha256, ct: ct_AesCbc128_HmacSha256, mac: mac_AesCbc128_HmacSha256 },
-        encKey,
-        macKey,
-      );
+      [iv, ct, mac] = encData.split('|');
+      return await AesCbc128_HmacSha256({ iv, ct, mac }, encKey, macKey);
     case 2:
-      const [, [iv_AesCbc256_HmacSha256, ct_AesCbc256_HmacSha256, mac_AesCbc256_HmacSha256]] = value
-        .split('.')
-        .map((x) => x.split('|'));
-      return await AesCbc256_HmacSha256(
-        { iv: iv_AesCbc256_HmacSha256, ct: ct_AesCbc256_HmacSha256, mac: mac_AesCbc256_HmacSha256 },
-        encKey,
-        macKey,
-      );
+      [iv, ct, mac] = encData.split('|');
+      return await AesCbc256_HmacSha256({ iv, ct, mac }, encKey, macKey);
     case 3:
-      const [, ct_Rsa2048_OaepSha256] = value.split('.');
-      return await Rsa2048_OaepSha256({ ct: ct_Rsa2048_OaepSha256 }, key);
+      return await Rsa2048_OaepSha256({ ct: encData }, key);
     case 4:
-      const [, ct_Rsa2048_OaepSha1] = value.split('.');
-      return await Rsa2048_OaepSha1({ ct: ct_Rsa2048_OaepSha1 }, key);
+      return await Rsa2048_OaepSha1({ ct: encData }, key);
     case 5:
       // TODO: Test Rsa2048_OaepSha256_HmacSha256
-      const [
-        ,
-        [
-          iv_Rsa2048_OaepSha256_HmacSha256,
-          ct_Rsa2048_OaepSha256_HmacSha256,
-          mac_Rsa2048_OaepSha256_HmacSha256,
-        ],
-      ] = value.split('.').map((x) => x.split('|'));
-      return await Rsa2048_OaepSha256_HmacSha256(
-        {
-          iv: iv_Rsa2048_OaepSha256_HmacSha256,
-          ct: ct_Rsa2048_OaepSha256_HmacSha256,
-          mac: mac_Rsa2048_OaepSha256_HmacSha256,
-        },
-        key,
-      );
+      [iv, ct, mac] = encData.split('|');
+      return await Rsa2048_OaepSha256_HmacSha256({ iv, ct, mac }, key);
     case 6:
       // TODO: Test Rsa2048_OaepSha1_HmacSha256
-      const [
-        ,
-        [
-          iv_Rsa2048_OaepSha1_HmacSha256,
-          ct_Rsa2048_OaepSha1_HmacSha256,
-          mac_Rsa2048_OaepSha1_HmacSha256,
-        ],
-      ] = value.split('.').map((x) => x.split('|'));
-      return await Rsa2048_OaepSha1_HmacSha256(
-        {
-          iv: iv_Rsa2048_OaepSha1_HmacSha256,
-          ct: ct_Rsa2048_OaepSha1_HmacSha256,
-          mac: mac_Rsa2048_OaepSha1_HmacSha256,
-        },
-        key,
-      );
+      [iv, ct, mac] = encData.split('|');
+      return await Rsa2048_OaepSha1_HmacSha256({ iv, ct, mac }, key);
     default:
       throw new Error(`Unknown encryption type ${encType}`);
   }

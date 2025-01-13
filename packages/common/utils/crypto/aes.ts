@@ -2,11 +2,11 @@
 // AesCbc128_HmacSha256_B64(byte = 1),
 // AesCbc256_HmacSha256_B64(byte = 2),
 
-import { fromArrayBufferToB64, fromB64ToUint8Array } from '../string';
-import { HmacSha256 } from './hmac';
+import { fromArrayBufferToB64, fromB64ToUint8Array, fromStringToUint8Array } from '../string';
+import { HmacSha256, HmacSha256Sign } from './hmac';
 import { crypto } from './crypto';
 
-export async function AesCbc256(
+async function AesCbc256(
   { iv, ct }: { iv: string; ct: string },
   encKey: Uint8Array,
 ): Promise<Uint8Array> {
@@ -62,8 +62,8 @@ async function AesCbc(
   return new Uint8Array(result);
 }
 
-export async function AesCbc256Encrypt(
-  { ct, iv }: { ct: Uint8Array; iv: Uint8Array },
+async function AesCbc256_Encrypt(
+  { ct, iv }: { ct: string; iv: string },
   encKey: Uint8Array,
 ): Promise<string> {
   const ckey = await crypto.subtle.importKey(
@@ -80,11 +80,24 @@ export async function AesCbc256Encrypt(
   const result = await crypto.subtle.encrypt(
     {
       name: 'AES-CBC',
-      iv,
+      iv: fromB64ToUint8Array(iv),
     },
     ckey,
-    ct,
+    fromStringToUint8Array(ct),
   );
 
   return fromArrayBufferToB64(result);
+}
+
+export async function AesCbc256_HmacSha256_Encrypt(
+  { ct, iv }: { ct: string; iv: string },
+  encKey: Uint8Array,
+  macKey: Uint8Array,
+): Promise<{ ct: string; mac: string }> {
+  const encryptedCt = await AesCbc256_Encrypt({ ct, iv }, encKey);
+  const mac = await HmacSha256Sign({ iv: iv, ct: encryptedCt }, macKey);
+  return {
+    ct: encryptedCt,
+    mac: fromArrayBufferToB64(mac),
+  };
 }
