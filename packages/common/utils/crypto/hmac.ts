@@ -1,12 +1,8 @@
 import { fromB64ToUint8Array } from '../string';
 import { crypto, isBrowser } from './crypto';
 
-export async function HmacSha256(
-  { iv, ct, mac }: { iv: string; ct: string; mac: string },
-  macKey: Uint8Array,
-) {
+export async function HmacSha256Sign({ iv, ct }: { iv: string; ct: string }, macKey: Uint8Array) {
   const encryptedContent = fromB64ToUint8Array(ct);
-  const integrity = fromB64ToUint8Array(mac);
   const ivBuffer = fromB64ToUint8Array(iv);
 
   const hmackey = await crypto.subtle.importKey(
@@ -24,7 +20,7 @@ export async function HmacSha256(
   macData.set(ivBuffer, 0);
   macData.set(encryptedContent, ivBuffer.byteLength);
 
-  const computedIntegrity = await crypto.subtle.sign(
+  return await crypto.subtle.sign(
     {
       name: 'HMAC',
       hash: 'SHA-256',
@@ -32,6 +28,14 @@ export async function HmacSha256(
     hmackey,
     macData,
   );
+}
+
+export async function HmacSha256(
+  { iv, ct, mac }: { iv: string; ct: string; mac: string },
+  macKey: Uint8Array,
+) {
+  const integrity = fromB64ToUint8Array(mac);
+  const computedIntegrity = await HmacSha256Sign({ iv, ct }, macKey);
 
   if (
     !integrity ||
@@ -48,13 +52,16 @@ function BuffersEqual(a: Uint8Array | Buffer, b: Uint8Array | Buffer) {
   if (!isBrowser) {
     return Buffer.compare(new Uint8Array(a), new Uint8Array(b)) === 0;
   }
+
   if (a.length !== b.length) {
     return false;
   }
+
+  //! constant-time compare
+  let result = 0;
   for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) {
-      return false;
-    }
+    result |= a[i] ^ b[i];
   }
-  return true;
+
+  return result === 0;
 }

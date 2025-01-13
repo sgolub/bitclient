@@ -4,7 +4,7 @@ import Service from '../types/Service';
 import { AccountViewModel } from '../models/view/Account';
 import { toAccountViewModel } from '../models/view/mapping';
 import { hashPassword } from '../utils/crypto/auth';
-import { AesCbc256, AesCbc256Encrypt } from '../utils/crypto/aes';
+import { AesCbc256_HmacSha256, AesCbc256_HmacSha256_Encrypt } from '../utils/crypto/aes';
 import { fromStringToUint8Array, fromUint8ArrayToB64 } from '../utils/string';
 import { sha256 } from 'hash-wasm';
 
@@ -74,26 +74,22 @@ export const login: Service<
 
   await db.updateAccount(account);
 
-  const emailHash = fromStringToUint8Array(await sha256(email)).slice(0, 16);
+  const emailHash = fromUint8ArrayToB64(fromStringToUint8Array(await sha256(email)).slice(0, 16));
+
+  const { accessToken, refreshToken } = await encryptTokens(
+    response.access_token,
+    response.access_token,
+    emailHash,
+    userKey,
+  );
+
   await db.addKeys({
     email,
     keys: {
-      accessToken: await AesCbc256Encrypt(
-        {
-          ct: fromStringToUint8Array(response.access_token),
-          iv: emailHash,
-        },
-        userKey.slice(0, 32),
-      ),
+      accessToken,
       expiresIn: new Date(response.expires_in),
       tokenType: response.token_type,
-      refreshToken: await AesCbc256Encrypt(
-        {
-          ct: fromStringToUint8Array(response.refresh_token),
-          iv: emailHash,
-        },
-        userKey.slice(0, 32),
-      ),
+      refreshToken,
       privateKey: response.PrivateKey,
       key: response.Key,
       organizationKeys: {},
@@ -142,10 +138,12 @@ export const unlock: Service<{ password: string; ctx: ApplicationContextJSON }, 
     const {
       keys: { refreshToken, key, privateKey },
     } = keys;
-    const emailHash = fromStringToUint8Array(await sha256(email)).slice(0, 16);
-    const decryptedRefreshToken = await AesCbc256(
-      { ct: refreshToken, iv: fromUint8ArrayToB64(emailHash) },
+    const emailHash = fromUint8ArrayToB64(fromStringToUint8Array(await sha256(email)).slice(0, 16));
+    const [ct, mac] = refreshToken.split('.');
+    const decryptedRefreshToken = await AesCbc256_HmacSha256(
+      { ct, iv: emailHash, mac },
       userKey.slice(0, 32),
+      userKey.slice(32, 64),
     );
 
     const { response } = await api.refreshToken(
@@ -160,23 +158,18 @@ export const unlock: Service<{ password: string; ctx: ApplicationContextJSON }, 
       },
     );
 
+    const { accessToken, refreshToken: newRefreshToken } = await encryptTokens(
+      response.access_token,
+      response.access_token,
+      emailHash,
+      userKey,
+    );
+
     keys.keys = {
-      accessToken: await AesCbc256Encrypt(
-        {
-          ct: fromStringToUint8Array(response.access_token),
-          iv: emailHash,
-        },
-        userKey.slice(0, 32),
-      ),
+      accessToken,
       expiresIn: new Date(response.expires_in),
       tokenType: response.token_type,
-      refreshToken: await AesCbc256Encrypt(
-        {
-          ct: fromStringToUint8Array(response.refresh_token),
-          iv: emailHash,
-        },
-        userKey.slice(0, 32),
-      ),
+      refreshToken: newRefreshToken,
       privateKey,
       key,
       organizationKeys: {},
@@ -191,3 +184,36 @@ export const logout: Service<{ email: string }, void> = async function ({ db }, 
   await db.deleteKeys(email);
   await db.deleteAccount(email);
 };
+
+async function encryptTokens(
+  accessToken: string,
+  refreshToken: string,
+  iv: string,
+  userKey: Uint8Array<ArrayBuffer>,
+): Promise<{ accessToken: string; refreshToken: string }> {
+  const encKey = userKey.slice(0, 32);
+  const macKey = userKey.slice(32, 64);
+
+  const { ct: accessTokenCt, mac: accessTokenMac } = await AesCbc256_HmacSha256_Encrypt(
+    {
+      ct: accessToken,
+      iv,
+    },
+    encKey,
+    macKey,
+  );
+
+  const { ct: refreshTokenCt, mac: refreshTokenMac } = await AesCbc256_HmacSha256_Encrypt(
+    {
+      ct: refreshToken,
+      iv,
+    },
+    encKey,
+    macKey,
+  );
+
+  return {
+    accessToken: `${accessTokenCt}.${accessTokenMac}`,
+    refreshToken: `${refreshTokenCt}.${refreshTokenMac}`,
+  };
+}

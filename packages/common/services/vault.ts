@@ -14,7 +14,7 @@ import { toAccountViewModel, toVaultViewModel } from '../models/view/mapping';
 import { VaultSearchViewModel } from '../models/view/VaultSearch';
 import { AccountViewModel } from '../models/view/Account';
 import { fromStringToUint8Array, fromUint8ArrayToB64 } from '../utils/string';
-import { AesCbc256 } from '../utils/crypto/aes';
+import { AesCbc256_HmacSha256 } from '../utils/crypto/aes';
 
 export const sync: Service<
   {
@@ -57,9 +57,11 @@ export const sync: Service<
   } = await db.getKeys(email);
 
   const emailHash = fromStringToUint8Array(await sha256(email)).slice(0, 16);
-  const decryptedAccessToken = await AesCbc256(
-    { ct: accessToken, iv: fromUint8ArrayToB64(emailHash) },
+  const [ct, mac] = accessToken.split('.');
+  const decryptedAccessToken = await AesCbc256_HmacSha256(
+    { ct, iv: fromUint8ArrayToB64(emailHash), mac },
     userKey.slice(0, 32),
+    userKey.slice(32, 64),
   );
 
   const response = await api.sync(
