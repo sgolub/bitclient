@@ -43,7 +43,11 @@ const INJECTIONs: Injections = {
 };
 
 export default function registerIPCHandlers(window: BrowserWindow) {
-  ipcMain.removeAllListeners();
+  // remove handlers
+  ipcMain.removeHandler('isPackaged');
+  ipcMain.removeHandler('service');
+
+  // register handlers
   ipcMain.handle('isPackaged', () => app.isPackaged);
   ipcMain.handle(
     'service',
@@ -58,6 +62,10 @@ export default function registerIPCHandlers(window: BrowserWindow) {
     },
   );
 
+  // remove listeners
+  ipcMain.removeAllListeners();
+
+  // register listeners
   ipcMain.on('lock', ({ sender }: IpcMainInvokeEvent, email?: string) => {
     if (sender !== window.webContents) {
       throw new UFOError();
@@ -73,6 +81,7 @@ export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('quit', () => app.quit());
   ipcMain.on('clipboard.writeText', (_e, text) => clipboard.writeText(text));
 
+  // power monitor events
   powerMonitor.removeAllListeners();
   powerMonitor.addListener('lock-screen', async () => {
     await Promise.resolve(lock(INJECTIONs, {}));
