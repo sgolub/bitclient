@@ -78,7 +78,7 @@ export const login: Service<
 
   const { accessToken, refreshToken } = await encryptTokens(
     response.access_token,
-    response.access_token,
+    response.refresh_token,
     emailHash,
     userKey,
   );
@@ -160,7 +160,7 @@ export const unlock: Service<{ password: string; ctx: ApplicationContextJSON }, 
 
     const { accessToken, refreshToken: newRefreshToken } = await encryptTokens(
       response.access_token,
-      response.access_token,
+      response.refresh_token,
       emailHash,
       userKey,
     );
