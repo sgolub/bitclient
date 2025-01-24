@@ -1,7 +1,7 @@
 {
   "name": "@bitclient/desktop",
   "productName": "Bitclient",
-  "version": "1.0.0-beta4",
+  "version": "1.0.0-beta5",
   "description": "Bitclient desktop application",
   "main": "./out/main/index.js",
   "author": "Sergey Golub <sergeyglb@outlook.com> (https://sergey.gl)",
@@ -59,7 +59,7 @@
     "react-dom": "^18.3.1",
     "sass": "^1.83.0",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11",
+    "vite": "^5.4.12",
     "vite-plugin-wasm": "^3.4.1"
   }
 }
