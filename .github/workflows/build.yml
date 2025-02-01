@@ -1,6 +1,9 @@
-name: Build/release
+name: Build & release
 
-on: push
+on:
+  push:
+    paths:
+      - packages/**
 
 jobs:
   release:
