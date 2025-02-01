@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Bitclient is an alternative client for the Bitwarden® platform.",
   "keywords": [],
-  "author": "Sergey Golub <sergeyglb@outlook.com> (https://sergey.gl)",
+  "author": "Sergey Golub <bitclient@sergey.gl> (https://sergey.gl)",
   "repository": "https://github.com/sgolub/bitclient",
   "engines": {
     "node": ">=20.0.0",
