@@ -33,7 +33,6 @@ export default function App() {
           Component: VaultPage,
           path: '/vault/:cipherId?',
           shouldRevalidate: ({ currentUrl, nextUrl }) => {
-            // console.log(currentUrl, nextUrl);
             if (
               currentUrl.searchParams.get('type') === nextUrl.searchParams.get('type') &&
               currentUrl.searchParams.get('folderId') === nextUrl.searchParams.get('folderId') &&
@@ -61,7 +60,6 @@ export default function App() {
               const query = searchParams.get('q') || '';
               const sortBy = searchParams.get('sortBy') || '';
               const reverse = searchParams.get('reverse') === 'true';
-              // await new Promise((resolve) => setTimeout(resolve, 1000));
               return await sync({
                 ctx,
                 search: {

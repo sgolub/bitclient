@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import './dropdown.scss';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -18,8 +18,8 @@ export default function Dropdown({
 
   useHotkeys('esc', () => setVissible(false), []);
 
-  const close = useMemo(
-    () => (e: Event) => {
+  const close = useCallback(
+    (e: Event) => {
       try {
         // e.preventDefault();
         // e.stopPropagation();
