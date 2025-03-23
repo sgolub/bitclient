@@ -52,9 +52,14 @@ export const sync: Service<
     throw new Error('User key not found 🛸');
   }
 
+  const keys = await db.getKeys(email);
+  if (!keys) {
+    throw new Error('Keys not found 🛸');
+  }
+
   const {
     keys: { accessToken },
-  } = await db.getKeys(email);
+  } = keys;
 
   const emailHash = fromStringToUint8Array(await sha256(email)).slice(0, 16);
   const [ct, mac] = accessToken.split('.');
@@ -78,14 +83,13 @@ export const sync: Service<
 
   const model = toVaultModel(response);
 
-  const keysModel = await db.getKeys(email);
-  keysModel.keys.organizationKeys = {};
+  keys.keys.organizationKeys = {};
   for (const organization of response.profile.organizations) {
-    keysModel.keys.organizationKeys[organization.id] = organization.key;
+    keys.keys.organizationKeys[organization.id] = organization.key;
   }
-  await db.updateKeys(keysModel);
+  await db.updateKeys(keys);
 
-  await decryptVault(model, userKey, keysModel);
+  await decryptVault(model, userKey, keys);
   await db.addVault(model);
 
   const viewModel = toVaultViewModel(model);

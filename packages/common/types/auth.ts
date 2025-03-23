@@ -32,6 +32,25 @@ export type LoginResponse = {
   };
 };
 
+export type LoginResponseTwoFactorAuth = {
+  error: string;
+  error_description: string;
+  TwoFactorProviders: TwoFactorAuthProvider[];
+  TwoFactorProviders2: Record<TwoFactorAuthProvider, { Email: string }>;
+  SsoEmail2faSessionToken: string;
+  Email: string;
+  MasterPasswordPolicy: { Object: string };
+};
+
+export enum TwoFactorAuthProvider {
+  None,
+  TOTP = '0',
+  Email = '1',
+  Passkey = '2', // ?
+  Yubikey = '3', // ?
+  Duo = '4', // ?
+}
+
 export type RefreshTokenResponse = {
   access_token: string;
   expires_in: number;

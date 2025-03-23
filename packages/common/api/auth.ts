@@ -13,12 +13,15 @@ import {
   LoginErrorResponse,
   RefreshTokenResponse,
   RefreshTokenErrorResponse,
+  LoginResponseTwoFactorAuth,
 } from '../types/auth';
 import { POST, ContentType } from '../types/http';
 import HttpProvider from '../types/HttpProvider';
 import { getURL, isBadRequest, isNotFound } from '../utils/http';
 import { request } from './request';
 import { KDFConfig } from '../types/KDFConfig';
+
+import has from 'lodash/has';
 
 async function prelogin(
   http: HttpProvider,
@@ -60,6 +63,7 @@ async function login(
     deviceName,
     deviceType,
     deviceIdentifier,
+    twoFactor,
   }: {
     email: string;
     password: string;
@@ -67,11 +71,24 @@ async function login(
     deviceName: string;
     deviceType: string;
     deviceIdentifier: string;
+    twoFactor?: {
+      token: string;
+      provider: string;
+      remember: boolean;
+    };
   },
 ) {
   headers['Auth-Email'] = fromUtf8ToUrlB64(email);
 
   const { hashedPassword, userKey } = await hashPassword(email, password, kdfConfig);
+
+  const twoFactorProps = twoFactor
+    ? {
+        twoFactorToken: twoFactor.token,
+        twoFactorProvider: twoFactor.provider,
+        twoFactorRemember: twoFactor.remember ? '1' : '0',
+      }
+    : {};
 
   const data = {
     grant_type: 'password',
@@ -82,9 +99,13 @@ async function login(
     deviceName,
     deviceType,
     deviceIdentifier,
+    ...twoFactorProps,
   };
 
-  const { ok, statusCode, body } = await request<LoginResponse, LoginErrorResponse>(
+  const { ok, statusCode, body } = await request<
+    LoginResponse,
+    LoginErrorResponse | LoginResponseTwoFactorAuth
+  >(
     http,
     getURL(baseUrl, '/identity/connect/token'),
     headers,
@@ -94,9 +115,13 @@ async function login(
   );
 
   if (ok) {
-    return { response: body, userKey };
+    return { twoFactorAuth: false, response: body, userKey };
   } else if (isBadRequest(statusCode)) {
-    throw new Error(body?.ErrorModel.Message);
+    if (!has(body, 'TwoFactorProviders')) {
+      throw new Error((body as LoginErrorResponse)?.ErrorModel.Message);
+    }
+
+    return { twoFactorAuth: true, response: body, userKey };
   } else {
     throw new Error('Unknown response.');
   }
