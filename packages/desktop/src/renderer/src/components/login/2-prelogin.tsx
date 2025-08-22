@@ -1,21 +1,29 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useRef } from 'react';
 import log from 'electron-log';
 
 import useApplicationContext from '@renderer/hooks/useApplicationContext';
 import useLoadingCallback from '@renderer/hooks/useLoadingCallback';
 import { prelogin } from '@renderer/services/account';
-import BitwardenServer from '@bitclient/common/types/BitwardenServer';
+// import BitwardenServer from '@bitclient/common/types/BitwardenServer';
 import Spin from '../common/icons/spin';
-import ServerInfo from './server';
+import WrongServer from './wrongServer';
 
 const { RENDERER_VITE_DEFAULT_EMAIL } = import.meta.env;
 
-export default function PreloginForm({ onSuccess }: { onSuccess: (email: string) => void }) {
+export default function Prelogin({
+  // server: _server,
+  goToLogin,
+  goBack,
+}: {
+  // server: BitwardenServer;
+  goToLogin: (email: string) => void;
+  goBack: () => void;
+}) {
   const [email, setEmail] = useState(RENDERER_VITE_DEFAULT_EMAIL || '');
   const [emailIsInvalid, setEmailIsInvalid] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { ctx, updateContext } = useApplicationContext();
+  const { ctx } = useApplicationContext();
   const emailInput = useRef<HTMLInputElement>(null);
 
   const onPrelogin = useLoadingCallback(
@@ -24,7 +32,7 @@ export default function PreloginForm({ onSuccess }: { onSuccess: (email: string)
         setIsLoading(true);
         await prelogin({ email, ctx });
         log.info('Prelogin success 🚀');
-        onSuccess(email);
+        goToLogin(email);
         setEmailIsInvalid(false);
       } catch (error) {
         log.error(error);
@@ -36,11 +44,6 @@ export default function PreloginForm({ onSuccess }: { onSuccess: (email: string)
     },
     [email, ctx],
   );
-
-  const resetServer = useCallback(() => {
-    ctx.setServer(BitwardenServer.empty());
-    updateContext(ctx);
-  }, [ctx]);
 
   return (
     <>
@@ -93,7 +96,7 @@ export default function PreloginForm({ onSuccess }: { onSuccess: (email: string)
             </button>
           )}
         </div>
-        <ServerInfo reset={resetServer} />
+        <WrongServer reset={goBack} />
       </form>
     </>
   );

@@ -1,62 +1,80 @@
-.server-list {
+%list-base {
   list-style: none;
   padding: 0;
   margin: 0;
   width: 16rem;
-  margin-top: 1rem;
+  margin: 1rem 0;
 }
 
-.server-list li {
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.server-list li button {
+%button-base {
   cursor: pointer;
   text-align: left;
   width: 100%;
   display: flex;
   align-items: center;
   padding: 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   text-decoration: none;
   background: var(--color-grey-03);
-  transition: 0.2s;
-  outline: solid 0 var(--color-primary-25);
   border: solid 1px transparent;
+  outline: solid 0 var(--color-primary-25);
   transition: all 0.15s ease;
+
+  &:focus {
+    border: solid 1px var(--color-blue-dark);
+    outline-width: 0.25rem;
+  }
+
+  &:hover {
+    background: var(--color-primary-50);
+  }
+
+  .btn-content {
+    flex: 1;
+    padding: 0 0.25rem;
+  }
+
+  label {
+    display: block;
+    cursor: pointer;
+    font-size: 1.4rem;
+  }
+
+  small {
+    display: block;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--color-grey-06);
+  }
+
+  .icon {
+    height: 2.2rem;
+    border-radius: 0.25rem;
+    margin-right: 0.25rem;
+  }
 }
 
-.server-list li button:focus {
-  border: solid 1px var(--color-blue-dark);
-  outline-width: 0.25rem;
+.two-factor-list,
+.server-list {
+  @extend %list-base;
+
+  li {
+    display: block;
+    margin-bottom: 0.5rem;
+
+    button {
+      @extend %button-base;
+    }
+  }
 }
 
-.server-list li button .btn-content {
-  flex: 1;
-  padding: 0 0.25rem;
+.two-factor-list {
+  margin-bottom: 1rem;
+  width: 20rem;
 }
 
-.server-list li button label {
-  display: block;
-  cursor: pointer;
-  font-size: 1.4rem;
-}
-
-.server-list li button small {
-  display: block;
-  cursor: pointer;
-  font-size: 0.8rem;
-  color: var(--color-grey-06);
-}
-
-.server-list li button .icon {
-  height: 2.2rem;
-  border-radius: 0.25rem;
-}
-
-.server-list li button:hover {
-  background: var(--color-primary-50);
+.mt-1 {
+  margin-top: 1rem;
 }
 
 .form-container {
@@ -116,20 +134,28 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .server-list li button {
-    background: var(--color-grey-07);
+  .two-factor-list,
+  .server-list {
+    li button {
+      background: var(--color-grey-07);
+      outline-color: var(--color-primary-50);
+
+      label {
+        color: var(--color-text-light);
+      }
+
+      small {
+        color: var(--color-grey-05);
+      }
+
+      &:hover {
+        background: var(--color-primary-75);
+      }
+    }
   }
-  .server-list li button label {
-    color: var(--color-text-light);
-  }
-  .server-list li button small {
-    color: var(--color-grey-05);
-  }
-  .server-list li button:hover {
-    background: var(--color-primary-75);
-  }
-  .server-list li button {
-    outline-color: var(--color-primary-50);
+
+  .two-factor-list li button .icon {
+    fill: var(--color-text-light);
   }
 }
 

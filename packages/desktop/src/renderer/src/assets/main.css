@@ -82,7 +82,7 @@ strong {
 
 .monospace.lucida,
 .monospace-slab.lucida {
-  font-feature-settings: 'ss13' 1;
+  font-feature-settings: 'ss13' 1; /*? ss11 */
 }
 
 @media (max-width: 720px) {
