@@ -133,7 +133,7 @@ function applySearch(vault: VaultViewModel, search: VaultSearchViewModel) {
   }
   if (search.query) {
     vault.ciphers = filter(vault.ciphers, (c) => {
-      return c.data.name.toLowerCase().includes(search.query.toLowerCase());
+      return c.name.toLowerCase().includes(search.query.toLowerCase());
     });
     // TODO: implement search by other fields
   } else {
