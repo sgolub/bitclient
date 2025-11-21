@@ -90,7 +90,7 @@ export default function CiphersList({
                     <CiphersFavicon cipher={cipher} />
                   </span>
                   <span className="cipher-name">
-                    <h3>{cipher.data.name}</h3>
+                    <h3>{cipher.name}</h3>
                     <small>
                       {cipher.type == CipherType.Login && (cipher.data as any).username}
                       {cipher.type == CipherType.Card &&

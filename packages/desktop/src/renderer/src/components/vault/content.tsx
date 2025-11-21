@@ -74,7 +74,7 @@ export default function CipherContent({
             <div className="cipher-icon">
               <CiphersFavicon cipher={cipher} />
             </div>
-            <div className="name">{cipher.data.name}</div>
+            <div className="name">{cipher.name}</div>
           </div>
           {cipher.type === CipherType.Login && (
             <LoginCipher
@@ -101,10 +101,10 @@ export default function CipherContent({
               showBorder={cipher.type === CipherType.SecureNote}
             />
           )}
-          {(cipher.data.notes || cipher.type === CipherType.SecureNote) && (
+          {(cipher.notes || cipher.type === CipherType.SecureNote) && (
             <NoteCipher
               cipherId={cipher.id}
-              notes={cipher.data.notes}
+              notes={cipher.notes}
               showBorder={cipher.type === CipherType.SecureNote}
             />
           )}

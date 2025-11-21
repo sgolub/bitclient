@@ -4,7 +4,7 @@
   "version": "1.0.0-beta5",
   "description": "Bitclient desktop application",
   "main": "./out/main/index.js",
-  "author": "Sergey Golub <sergeyglb@outlook.com> (https://sergey.gl)",
+  "author": "Sergey Golub <bitclient@sergey.gl> (https://sergey.gl)",
   "repository": "https://github.com/sgolub/bitclient",
   "engines": {
     "node": ">=20"

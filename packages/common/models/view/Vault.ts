@@ -10,6 +10,9 @@ export type CipherViewModel = {
   id: ID;
   favorite: boolean;
 
+  name: string;
+  notes: string;
+
   // attachments: any[] | null;
   collectionIds: ID[];
   folderId: ID | null;
@@ -69,8 +72,6 @@ export type FolderViewModel = {
 
 export type BaseDataViewModel = {
   fields: CustomFieldViewModel[];
-  name: string;
-  notes: string;
 };
 
 export type LoginDataViewModel = {

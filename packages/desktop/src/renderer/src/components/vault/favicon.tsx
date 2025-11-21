@@ -48,7 +48,7 @@ export default function CiphersFavicon({ cipher }: { cipher: CipherViewModel }) 
           <img
             src={favicon}
             className="favicon"
-            alt={'Favicon for ' + cipher.data.name}
+            alt={'Favicon for ' + cipher.name}
             onError={() => setFavicon(null)}
           />
         ) : (
