@@ -33,8 +33,8 @@ export async function decryptVault(vault: VaultModel, userKey: Uint8Array, keysM
 
     const theKey = await getCipherKey(cipher, userKey, keysModel);
 
-    data.name = await decrypt_string(data.name, theKey);
-    data.notes = await decrypt_string(data.notes, theKey);
+    cipher.name = await decrypt_string(cipher.name, theKey);
+    cipher.notes = cipher.notes ? await decrypt_string(cipher.notes, theKey) : '';
     for (const field of data.fields) {
       field.name = await decrypt_string(field.name, theKey);
       switch (field.type) {

@@ -35,6 +35,8 @@ function toCipherViewModel(value: CipherModel): CipherViewModel {
   return {
     id: value.id,
     favorite: value.favorite,
+    name: value.name,
+    notes: value.notes || '',
     collectionIds: value.collectionIds.map((id) => id),
     folderId: value.folderId,
     organizationId: value.organizationId,
@@ -69,8 +71,6 @@ function toFolderViewModel(value: FolderModel): FolderViewModel {
 
 function toDataViewModel(data: BaseDataModel, cipherType: CipherType) {
   const base: BaseDataViewModel = {
-    name: data.name,
-    notes: data.notes,
     fields: data.fields.map((field) => ({
       name: field.name,
       value: field.value,

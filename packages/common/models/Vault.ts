@@ -10,8 +10,8 @@ export type VaultModel = {
 
 export type CipherModel = {
   id: ID;
-  // name: string;
-  // notes: string;
+  name: string;
+  notes: string | null;
   // fields: CustomFieldModel[];
   favorite: boolean;
 
@@ -78,8 +78,6 @@ export type FolderModel = {
 
 export type BaseDataModel = {
   fields: CustomFieldModel[];
-  name: string;
-  notes: string;
 };
 
 export type LoginDataModel = {

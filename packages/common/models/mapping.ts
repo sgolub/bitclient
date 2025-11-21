@@ -53,6 +53,9 @@ export function toVaultModel(vault: SyncResponse): VaultModel {
       id: cipher.id,
       favorite: cipher.favorite,
 
+      name: cipher.name,
+      notes: cipher.notes || '',
+
       collectionIds: cipher.collectionIds,
       folderId: cipher.folderId,
 
@@ -69,9 +72,7 @@ export function toVaultModel(vault: SyncResponse): VaultModel {
     };
 
     const data: BaseDataModel = {
-      name: cipher.data.name || '',
       fields,
-      notes: cipher.data.notes || '',
       // passwordHistory: cipher.data.passwordHistory || [],
     };
 
