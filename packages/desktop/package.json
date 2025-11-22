@@ -1,7 +1,7 @@
 {
   "name": "@bitclient/desktop",
   "productName": "Bitclient",
-  "version": "1.0.0-beta6",
+  "version": "1.0.0-beta7",
   "description": "Bitclient desktop application",
   "main": "./out/main/index.js",
   "author": "Sergey Golub <bitclient@sergey.gl> (https://sergey.gl)",

@@ -22,7 +22,7 @@ export default class BitwardenServer {
       //! Bitwarden mandatory headers
       'Device-Type': deviceType,
       'Bitwarden-Client-Name': clientId,
-      'Bitwarden-Client-Version': '2024.6.3', // seems like any number is acceptable
+      'Bitwarden-Client-Version': '2025.11.1',
       'User-Agent': this.userAgent,
       //! headers below are required only for clientId: 'web'
       // 'Accept-Language': 'en-US', //'en-US,en;q=0.9,ru;q=0.8,be;q=0.7',
