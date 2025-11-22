@@ -1,20 +1,16 @@
-import { useCallback } from 'react';
-
 import { BITWARDEN_OFFICIAL_SERVERS } from '@renderer/contexts/applicationContext';
-import useApplicationContext from '@renderer/hooks/useApplicationContext';
+import BitwardenServer from '@bitclient/common/types/BitwardenServer';
 import Europe from '../common/icons/Europe';
 import USA from '../common/icons/USA';
 
-export default function Intro() {
-  const { ctx, updateContext } = useApplicationContext();
-
-  const onServerChange = useCallback(
-    (i: number) => {
-      ctx.setServer(BITWARDEN_OFFICIAL_SERVERS[i]);
-      updateContext(ctx);
-    },
-    [ctx],
-  );
+export default function ChooseServer({
+  goToPrelogin,
+}: {
+  goToPrelogin: (newServer: BitwardenServer) => void;
+}) {
+  const onServerChange = (i: number) => {
+    goToPrelogin(BITWARDEN_OFFICIAL_SERVERS[i]);
+  };
 
   return (
     <>
@@ -28,7 +24,7 @@ export default function Intro() {
               {server.url.endsWith('com') ? <USA className="icon" /> : <Europe className="icon" />}
               <span className="btn-content">
                 <label>{server.displayName}</label>
-                <small>{server.desciption}</small>
+                <small>{server.description}</small>
               </span>
             </button>
           </li>

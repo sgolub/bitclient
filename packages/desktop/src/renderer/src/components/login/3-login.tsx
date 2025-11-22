@@ -5,12 +5,24 @@ import useApplicationContext from '@renderer/hooks/useApplicationContext';
 import useLoadingCallback from '@renderer/hooks/useLoadingCallback';
 import { login } from '@renderer/services/account';
 import Spin from '../common/icons/spin';
-import ServerInfo from './server';
+import WrongServer from './wrongServer';
 import BitwardenServer from '@bitclient/common/types/BitwardenServer';
+import { TwoFactorAuthProvider } from '@bitclient/common/types/auth';
+import NotYou from './notYou';
 
 const { RENDERER_VITE_DEFAULT_PASSWORD } = import.meta.env;
 
-export default function LoginForm({ email, goBack }: { email: string; goBack: () => void }) {
+export default function Login({
+  email,
+  // server: _server,
+  goToChooseTwoFactor,
+  goBack,
+}: {
+  email: string;
+  // server: BitwardenServer;
+  goToChooseTwoFactor: (password: string, providers: TwoFactorAuthProvider[]) => void;
+  goBack: () => void;
+}) {
   const { ctx, updateContext } = useApplicationContext();
   const [password, setPassword] = useState(RENDERER_VITE_DEFAULT_PASSWORD || '');
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
@@ -21,8 +33,15 @@ export default function LoginForm({ email, goBack }: { email: string; goBack: ()
     async function (): Promise<void> {
       try {
         setIsLoading(true);
-        const account = await login({ email, password, ctx });
-        updateContext(ctx.setAccount(account));
+        const res = await login({ email, password, ctx });
+
+        if (res.twoFactor) {
+          log.info('2FA required', res.providers);
+          goToChooseTwoFactor(password, res.providers as TwoFactorAuthProvider[]);
+          return;
+        }
+
+        updateContext(ctx.setAccount(res.account));
         setPasswordIsInvalid(false);
         log.info('Login success 🚀');
       } catch (error) {
@@ -53,13 +72,7 @@ export default function LoginForm({ email, goBack }: { email: string; goBack: ()
         }}
       >
         <div className="form-row">
-          <label>
-            Logging in as&nbsp;<strong>{email}</strong>
-          </label>
-          <br />
-          <button type="button" className="btn link" onClick={goBack}>
-            Not you?
-          </button>
+          <NotYou email={email} goBack={goBack} />
         </div>
         <div className="form-row">
           <input
@@ -89,7 +102,7 @@ export default function LoginForm({ email, goBack }: { email: string; goBack: ()
             </button>
           )}
         </div>
-        <ServerInfo reset={resetServer} />
+        <WrongServer reset={resetServer} />
       </form>
     </>
   );

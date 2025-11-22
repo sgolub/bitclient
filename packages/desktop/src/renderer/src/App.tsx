@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { createHashRouter, RouterProvider } from 'react-router-dom';
+import { createHashRouter, Navigate, RouterProvider } from 'react-router-dom';
 import log from 'electron-log';
 
 import ApplicationContext from '@bitclient/common/types/ApplicationContext';
@@ -22,8 +22,13 @@ export default function App() {
     () =>
       createHashRouter([
         {
-          Component: LoginPage,
+          path: '/',
           index: true,
+          element: <Navigate to="/auth" replace />,
+        },
+        {
+          path: '/auth/*',
+          Component: LoginPage,
         },
         {
           Component: LockPage,

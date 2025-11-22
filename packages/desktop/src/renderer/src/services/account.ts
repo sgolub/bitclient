@@ -2,6 +2,7 @@ import { AccountViewModel } from '@bitclient/common/models/view/Account';
 import ApplicationContext, {
   ApplicationContextJSON,
 } from '@bitclient/common/types/ApplicationContext';
+import { TwoFactorAuthProvider } from '@bitclient/common/types/auth';
 
 const { service } = window.api;
 
@@ -23,7 +24,8 @@ export async function login({
 }) {
   return await service<
     { ctx: ApplicationContextJSON; email: string; password: string },
-    AccountViewModel
+    | { twoFactor: false; account: AccountViewModel }
+    | { twoFactor: true; providers: TwoFactorAuthProvider[] }
   >('login', {
     ctx: ctx.toJSON(),
     email,
