@@ -7,6 +7,7 @@ import { prelogin } from '@renderer/services/account';
 // import BitwardenServer from '@bitclient/common/types/BitwardenServer';
 import Spin from '../common/icons/spin';
 import WrongServer from './wrongServer';
+import { toErrorMessage } from '../common/utils';
 
 const { RENDERER_VITE_DEFAULT_EMAIL } = import.meta.env;
 
@@ -23,12 +24,14 @@ export default function Prelogin({
   const [emailIsInvalid, setEmailIsInvalid] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { ctx } = useApplicationContext();
   const emailInput = useRef<HTMLInputElement>(null);
 
   const onPrelogin = useLoadingCallback(
     async function (): Promise<void> {
       try {
+        setErrorMessage('');
         setIsLoading(true);
         await prelogin({ email, ctx });
         log.info('Prelogin success 🚀');
@@ -36,6 +39,7 @@ export default function Prelogin({
         setEmailIsInvalid(false);
       } catch (error) {
         log.error(error);
+        setErrorMessage(toErrorMessage(error));
         setEmailIsInvalid(true);
         emailInput.current?.focus();
       } finally {
@@ -68,7 +72,10 @@ export default function Prelogin({
             inputMode="email"
             required={true}
             className={emailIsInvalid ? 'invalid' : ''}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrorMessage('');
+            }}
           />
         </div>
         <div className="form-row toggle-control">
@@ -96,6 +103,11 @@ export default function Prelogin({
             </button>
           )}
         </div>
+        {errorMessage && (
+          <div className="form-row">
+            <p className="error-message">{errorMessage}</p>
+          </div>
+        )}
         <WrongServer reset={goBack} />
       </form>
     </>

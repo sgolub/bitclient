@@ -1,7 +1,8 @@
 export type PreloginValidationErrorsResponse = {
-  validationErrors: {
+  validationErrors?: {
     Email: [string];
   };
+  Message?: string;
 };
 
 export type PreloginResponse = {

@@ -124,6 +124,11 @@
   animation: spin 1s linear infinite;
 }
 
+.error-message {
+  color: var(--color-invalid);
+  font-size: small;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

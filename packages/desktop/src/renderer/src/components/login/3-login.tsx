@@ -9,6 +9,7 @@ import WrongServer from './wrongServer';
 import BitwardenServer from '@bitclient/common/types/BitwardenServer';
 import { TwoFactorAuthProvider } from '@bitclient/common/types/auth';
 import NotYou from './notYou';
+import { toErrorMessage } from '../common/utils';
 
 const { RENDERER_VITE_DEFAULT_PASSWORD } = import.meta.env;
 
@@ -27,12 +28,14 @@ export default function Login({
   const [password, setPassword] = useState(RENDERER_VITE_DEFAULT_PASSWORD || '');
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const passwordInput = useRef<HTMLInputElement>(null);
 
   const onLogin = useLoadingCallback(
     async function (): Promise<void> {
       try {
         setIsLoading(true);
+        setErrorMessage('');
         const res = await login({ email, password, ctx });
 
         if (res.twoFactor) {
@@ -43,9 +46,11 @@ export default function Login({
 
         updateContext(ctx.setAccount(res.account));
         setPasswordIsInvalid(false);
+
         log.info('Login success 🚀');
       } catch (error) {
-        log.error(error);
+        log.info(error);
+        setErrorMessage(toErrorMessage(error));
         setPasswordIsInvalid(true);
         passwordInput.current?.focus();
       } finally {
@@ -86,7 +91,10 @@ export default function Login({
             autoFocus={true}
             required={true}
             className={passwordIsInvalid ? 'invalid' : ''}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setErrorMessage('');
+              setPassword(e.target.value);
+            }}
           />
         </div>
         <div className="form-row">
@@ -102,6 +110,11 @@ export default function Login({
             </button>
           )}
         </div>
+        {errorMessage && (
+          <div className="form-row">
+            <p className="error-message">{errorMessage}</p>
+          </div>
+        )}
         <WrongServer reset={resetServer} />
       </form>
     </>

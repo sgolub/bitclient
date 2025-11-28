@@ -7,6 +7,7 @@ import WrongServer from './wrongServer';
 import NotYou from './notYou';
 import BitwardenServer from '@bitclient/common/types/BitwardenServer';
 import useApplicationContext from '@renderer/hooks/useApplicationContext';
+import { toErrorMessage } from '../common/utils';
 
 export default function TwoFactor({
   email,
@@ -22,16 +23,19 @@ export default function TwoFactor({
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [otpIsInvalid, setOtpIsInvalid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const otpInput = useRef<HTMLInputElement>(null);
 
   const { ctx, updateContext } = useApplicationContext();
   const onTwoFactorVerification = useLoadingCallback(
     async function (): Promise<void> {
       try {
+        setErrorMessage('');
         setIsLoading(true);
         throw new Error('Not implemented'); // TODO: implement 2FA verification
       } catch (error) {
         log.error(error);
+        setErrorMessage(toErrorMessage(error));
         setOtpIsInvalid(true);
         otpInput.current?.focus();
       } finally {
@@ -89,6 +93,11 @@ export default function TwoFactor({
             </button>
           )}
         </div>
+        {errorMessage && (
+          <div className="form-row">
+            <p className="error-message">{errorMessage}</p>
+          </div>
+        )}
       </form>
       <WrongServer reset={resetServer} />
     </>
