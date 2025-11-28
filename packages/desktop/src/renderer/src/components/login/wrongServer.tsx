@@ -1,6 +1,6 @@
 import useApplicationContext from '@renderer/hooks/useApplicationContext';
 
-export default function ServerInfo({ reset }: { reset: () => void }) {
+export default function WrongServer({ reset }: { reset: () => void }) {
   const { ctx } = useApplicationContext();
 
   return (
