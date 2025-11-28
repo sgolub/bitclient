@@ -40,7 +40,8 @@ async function prelogin(
       kdfParallelism: kdfParallelism || (kdf == 0 ? null : ARGON2_PARALLELISM),
     } as KDFConfig;
   } else if (isBadRequest(statusCode) && !isNotFound(statusCode)) {
-    throw body?.validationErrors.Email[0];
+    const [emailVerificationError] = body?.validationErrors?.Email || [];
+    throw new Error(emailVerificationError ?? body?.Message ?? 'Prelogin failed ⛔');
   } else {
     throw new Error('Unknown response.');
   }

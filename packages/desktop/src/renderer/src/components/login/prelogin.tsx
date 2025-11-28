@@ -7,6 +7,7 @@ import { prelogin } from '@renderer/services/account';
 import BitwardenServer from '@bitclient/common/types/BitwardenServer';
 import Spin from '../common/icons/spin';
 import ServerInfo from './server';
+import { toErrorMessage } from '../common/utils';
 
 const { RENDERER_VITE_DEFAULT_EMAIL } = import.meta.env;
 
@@ -16,11 +17,13 @@ export default function PreloginForm({ onSuccess }: { onSuccess: (email: string)
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { ctx, updateContext } = useApplicationContext();
+  const [errorMessage, setErrorMessage] = useState('');
   const emailInput = useRef<HTMLInputElement>(null);
 
   const onPrelogin = useLoadingCallback(
     async function (): Promise<void> {
       try {
+        setErrorMessage('');
         setIsLoading(true);
         await prelogin({ email, ctx });
         log.info('Prelogin success 🚀');
@@ -28,6 +31,7 @@ export default function PreloginForm({ onSuccess }: { onSuccess: (email: string)
         setEmailIsInvalid(false);
       } catch (error) {
         log.error(error);
+        setErrorMessage(toErrorMessage(error));
         setEmailIsInvalid(true);
         emailInput.current?.focus();
       } finally {
@@ -65,7 +69,10 @@ export default function PreloginForm({ onSuccess }: { onSuccess: (email: string)
             inputMode="email"
             required={true}
             className={emailIsInvalid ? 'invalid' : ''}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrorMessage('');
+            }}
           />
         </div>
         <div className="form-row toggle-control">
@@ -93,6 +100,11 @@ export default function PreloginForm({ onSuccess }: { onSuccess: (email: string)
             </button>
           )}
         </div>
+        {errorMessage && (
+          <div className="form-row">
+            <p className="error-message">{errorMessage}</p>
+          </div>
+        )}
         <ServerInfo reset={resetServer} />
       </form>
     </>
