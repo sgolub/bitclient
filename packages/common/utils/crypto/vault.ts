@@ -11,6 +11,10 @@ import {
 
 export async function decryptVault(vault: VaultModel, userKey: Uint8Array, keysModel: KeysModel) {
   const { keys } = keysModel;
+  if (!keys) {
+    throw new Error('Keys not found 🛸');
+  }
+
   for (const folder of vault.folders) {
     const key = await decrypt(keys.key, userKey);
     folder.name = await decrypt_string(folder.name, key);
@@ -101,6 +105,11 @@ export async function decryptVault(vault: VaultModel, userKey: Uint8Array, keysM
 
 export async function getCipherKey(cipher: CipherModel, userKey: Uint8Array, { keys }: KeysModel) {
   const { organizationId, key: cipherKey } = cipher;
+
+  if (!keys) {
+    throw new Error('Keys not found 🛸');
+  }
+
   let key = await decrypt(keys.key, userKey);
 
   if (organizationId && keys.organizationKeys[organizationId]) {
