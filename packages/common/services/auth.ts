@@ -32,15 +32,17 @@ export const login: Service<
   {
     email: string;
     password: string;
+    newDeviceOtp?: string;
     twoFactorToken: string;
     twoFactorProvider: string;
     ctx: ApplicationContextJSON;
   },
-  | { twoFactor: false; account: AccountViewModel }
-  | { twoFactor: true; providers: TwoFactorAuthProvider[] }
+  | { twoFactor: false; account: AccountViewModel; unknownDevice: false }
+  | { twoFactor: true; providers: TwoFactorAuthProvider[]; unknownDevice: false }
+  | { twoFactor: false; unknownDevice: true }
 > = async function (
   { http, db },
-  { email, password, twoFactorToken, twoFactorProvider, ctx: ctxJSON },
+  { email, password, newDeviceOtp, twoFactorToken, twoFactorProvider, ctx: ctxJSON },
 ) {
   const ctx = ApplicationContext.fromJSON(ctxJSON);
   let account = await db.getAccount(email);
@@ -51,7 +53,7 @@ export const login: Service<
 
   const kdfConfig = account.kdf;
 
-  const { twoFactorAuth, response, userKey } = await api.login(
+  const { twoFactorAuth, deviceError, response, userKey } = await api.login(
     http,
     {
       baseUrl: ctx.server.url,
@@ -65,6 +67,7 @@ export const login: Service<
       deviceName: ctx.device.deviceName,
       deviceType: ctx.device.deviceType,
       deviceIdentifier: ctx.device.deviceIdentifier,
+      newDeviceOtp,
       twoFactor: twoFactorProvider
         ? {
             token: twoFactorToken,
@@ -81,6 +84,14 @@ export const login: Service<
     return {
       twoFactor: true,
       providers: res.TwoFactorProviders,
+      unknownDevice: false,
+    };
+  }
+
+  if (deviceError) {
+    return {
+      twoFactor: false,
+      unknownDevice: true,
     };
   }
 
@@ -129,6 +140,7 @@ export const login: Service<
   return {
     twoFactor: false,
     account: toAccountViewModel(account),
+    unknownDevice: false,
   };
 };
 

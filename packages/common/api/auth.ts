@@ -64,6 +64,7 @@ async function login(
     deviceName,
     deviceType,
     deviceIdentifier,
+    newDeviceOtp,
     twoFactor,
   }: {
     email: string;
@@ -72,6 +73,7 @@ async function login(
     deviceName: string;
     deviceType: string;
     deviceIdentifier: string;
+    newDeviceOtp?: string;
     twoFactor?: {
       token: string;
       provider: string;
@@ -103,6 +105,10 @@ async function login(
     ...twoFactorProps,
   };
 
+  if (newDeviceOtp) {
+    (data as any).newDeviceOtp = newDeviceOtp;
+  }
+
   const { ok, statusCode, body } = await request<
     LoginResponse,
     LoginErrorResponse | LoginResponseTwoFactorAuth
@@ -116,13 +122,20 @@ async function login(
   );
 
   if (ok) {
-    return { twoFactorAuth: false, response: body, userKey };
+    return { twoFactorAuth: false, deviceError: false, response: body, userKey };
   } else if (isBadRequest(statusCode)) {
-    if (!has(body, 'TwoFactorProviders')) {
-      throw new Error((body as LoginErrorResponse)?.ErrorModel.Message);
+    const errorRes = body as LoginErrorResponse;
+    if (errorRes?.error === 'device_error') {
+      return { twoFactorAuth: false, deviceError: true, response: body, userKey };
     }
 
-    return { twoFactorAuth: true, response: body, userKey };
+    if (has(body, 'TwoFactorProviders')) {
+      return { twoFactorAuth: true, deviceError: false, response: body, userKey };
+    }
+
+    throw new Error(
+      errorRes?.ErrorModel?.Message ?? errorRes?.error_description ?? 'Login failed ⛔',
+    );
   } else {
     throw new Error('Unknown response.');
   }

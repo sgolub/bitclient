@@ -17,18 +17,22 @@ export async function login({
   ctx,
   email,
   password,
+  newDeviceOtp,
 }: {
   ctx: ApplicationContext;
   email: string;
   password: string;
+  newDeviceOtp?: string;
 }) {
   return await service<
-    { ctx: ApplicationContextJSON; email: string; password: string },
-    | { twoFactor: false; account: AccountViewModel }
-    | { twoFactor: true; providers: TwoFactorAuthProvider[] }
+    { ctx: ApplicationContextJSON; email: string; password: string; newDeviceOtp?: string },
+    | { twoFactor: false; account: AccountViewModel; unknownDevice: false }
+    | { twoFactor: true; providers: TwoFactorAuthProvider[]; unknownDevice: false }
+    | { twoFactor: false; unknownDevice: true }
   >('login', {
     ctx: ctx.toJSON(),
     email,
     password,
+    newDeviceOtp,
   });
 }

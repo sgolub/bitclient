@@ -26,6 +26,9 @@ export default function Login({
 }) {
   const { ctx, updateContext } = useApplicationContext();
   const [password, setPassword] = useState(RENDERER_VITE_DEFAULT_PASSWORD || '');
+  const [newDeviceOtp, setNewDeviceOtp] = useState('');
+  const [deviceIsUnknown, setDeviceIsUnknown] = useState(false);
+  const [deviceOtpIsInvalid, setDeviceOtpIsInvalid] = useState(false);
   const [passwordIsInvalid, setPasswordIsInvalid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -36,7 +39,9 @@ export default function Login({
       try {
         setIsLoading(true);
         setErrorMessage('');
-        const res = await login({ email, password, ctx });
+        const res = newDeviceOtp
+          ? await login({ email, password, newDeviceOtp, ctx })
+          : await login({ email, password, ctx });
 
         if (res.twoFactor) {
           log.info('2FA required', res.providers);
@@ -44,20 +49,33 @@ export default function Login({
           return;
         }
 
+        if (res.unknownDevice) {
+          setDeviceIsUnknown(true);
+          setNewDeviceOtp('');
+          if (newDeviceOtp) {
+            setDeviceOtpIsInvalid(true);
+          }
+          log.info('Unknown device error');
+          return;
+        }
+
         updateContext(ctx.setAccount(res.account));
         setPasswordIsInvalid(false);
+        setDeviceOtpIsInvalid(false);
 
         log.info('Login success 🚀');
       } catch (error) {
         log.info(error);
         setErrorMessage(toErrorMessage(error));
-        setPasswordIsInvalid(true);
+        newDeviceOtp ? setDeviceOtpIsInvalid(true) : setPasswordIsInvalid(true);
+        setDeviceIsUnknown(false);
+        setNewDeviceOtp('');
         passwordInput.current?.focus();
       } finally {
         setIsLoading(false);
       }
     },
-    [email, password, ctx],
+    [email, password, newDeviceOtp, ctx],
   );
 
   const resetServer = useCallback(() => {
@@ -79,28 +97,53 @@ export default function Login({
         <div className="form-row">
           <NotYou email={email} goBack={goBack} />
         </div>
-        <div className="form-row">
-          <input
-            type="password"
-            name="password"
-            id="password"
-            ref={passwordInput}
-            autoComplete="off"
-            value={password}
-            placeholder="Master password"
-            autoFocus={true}
-            required={true}
-            className={passwordIsInvalid ? 'invalid' : ''}
-            onChange={(e) => {
-              setErrorMessage('');
-              setPassword(e.target.value);
-            }}
-          />
-        </div>
+        {!deviceIsUnknown ? (
+          <div className="form-row">
+            <input
+              type="password"
+              name="password"
+              id="password"
+              ref={passwordInput}
+              autoComplete="off"
+              value={password}
+              placeholder="Master password"
+              autoFocus={true}
+              required={true}
+              className={passwordIsInvalid ? 'invalid' : ''}
+              onChange={(e) => {
+                setErrorMessage('');
+                setPassword(e.target.value);
+              }}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="form-row">
+              <label>Enter the code sent to your email to verify your identity.</label>
+            </div>
+            <div className="form-row">
+              <input
+                type="text"
+                name="otp"
+                id="otp"
+                autoComplete="off"
+                value={newDeviceOtp}
+                placeholder="XXXXXX"
+                autoFocus={true}
+                required={true}
+                className={deviceOtpIsInvalid ? 'invalid' : ''}
+                onChange={(e) => {
+                  setErrorMessage('');
+                  setNewDeviceOtp(e.target.value);
+                }}
+              />
+            </div>
+          </>
+        )}
         <div className="form-row">
           {!isLoading && (
             <button type="submit" disabled={!password} className="btn">
-              Log in with master password
+              {!deviceIsUnknown ? 'Log in with master password' : 'Continue logging in'}
             </button>
           )}
           {isLoading && (
