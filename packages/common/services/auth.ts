@@ -33,17 +33,13 @@ export const login: Service<
     email: string;
     password: string;
     newDeviceOtp?: string;
-    twoFactorToken: string;
-    twoFactorProvider: string;
+    twoFactor?: { token: string; provider: string; remember: boolean };
     ctx: ApplicationContextJSON;
   },
   | { twoFactor: false; account: AccountViewModel; unknownDevice: false }
   | { twoFactor: true; providers: TwoFactorAuthProvider[]; unknownDevice: false }
   | { twoFactor: false; unknownDevice: true }
-> = async function (
-  { http, db },
-  { email, password, newDeviceOtp, twoFactorToken, twoFactorProvider, ctx: ctxJSON },
-) {
+> = async function ({ http, db }, { email, password, newDeviceOtp, twoFactor, ctx: ctxJSON }) {
   const ctx = ApplicationContext.fromJSON(ctxJSON);
   let account = await db.getAccount(email);
 
@@ -68,13 +64,7 @@ export const login: Service<
       deviceType: ctx.device.deviceType,
       deviceIdentifier: ctx.device.deviceIdentifier,
       newDeviceOtp,
-      twoFactor: twoFactorProvider
-        ? {
-            token: twoFactorToken,
-            provider: twoFactorProvider,
-            remember: false,
-          }
-        : undefined,
+      twoFactor: twoFactor ? { ...twoFactor } : undefined,
     },
   );
 
@@ -227,6 +217,30 @@ export const logout: Service<{ email: string }, void> = async function ({ db }, 
   await db.deleteVault(email);
   await db.deleteKeys(email);
   await db.deleteAccount(email);
+};
+
+export const sendEmailLogin: Service<
+  { email: string; password: string; ctx: ApplicationContextJSON },
+  void
+> = async function ({ http, db }, { email, password, ctx: ctxJSON }) {
+  const ctx = ApplicationContext.fromJSON(ctxJSON);
+  let account = await db.getAccount(email);
+
+  if (!account) {
+    throw new Error('Account not found ⛔');
+  }
+
+  const kdfConfig = account.kdf;
+
+  await api.sendEmailLogin(
+    http,
+    {
+      baseUrl: ctx.server.url,
+      headers: ctx.getServerMandatoryHeaders(),
+      kdfConfig,
+    },
+    { email, password, deviceIdentifier: ctx.device.deviceIdentifier },
+  );
 };
 
 async function encryptTokens(

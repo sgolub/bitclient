@@ -3,7 +3,7 @@ import log from 'electron-log';
 
 import useApplicationContext from '@renderer/hooks/useApplicationContext';
 import useLoadingCallback from '@renderer/hooks/useLoadingCallback';
-import { login } from '@renderer/services/account';
+import { login, sendEmailLogin } from '@renderer/services/account';
 import Spin from '../common/icons/spin';
 import WrongServer from './wrongServer';
 import BitwardenServer from '@bitclient/common/types/BitwardenServer';
@@ -50,6 +50,11 @@ export default function Login({
         }
 
         if (res.unknownDevice) {
+          sendEmailLogin({
+            ctx,
+            email,
+            password,
+          });
           setDeviceIsUnknown(true);
           setNewDeviceOtp('');
           if (newDeviceOtp) {

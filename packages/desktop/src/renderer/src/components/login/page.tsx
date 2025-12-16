@@ -15,7 +15,7 @@ import './login.scss';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
-  const [, setPassword] = useState('');
+  const [password, setPassword] = useState('');
   const [twoFactorProviders, setTwoFactorProviders] = useState<TwoFactorAuthProvider[]>([]);
   const [twoFactorType, setTwoFactorType] = useState(TwoFactorAuthProvider.None);
 
@@ -117,7 +117,7 @@ export default function LoginPage() {
             element={
               <TwoFactor
                 email={email}
-                // password={password}
+                password={password}
                 twoFactorType={twoFactorType}
                 goBack={() => {
                   setEmail('');

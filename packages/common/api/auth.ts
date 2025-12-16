@@ -170,4 +170,35 @@ async function refreshToken(
   }
 }
 
-export default { prelogin, login, refreshToken };
+async function sendEmailLogin(
+  http: HttpProvider,
+  {
+    baseUrl,
+    headers,
+    kdfConfig,
+  }: { baseUrl: string; headers: Record<string, string | string[]>; kdfConfig: KDFConfig },
+  {
+    email,
+    password,
+    deviceIdentifier,
+  }: { email: string; password: string; deviceIdentifier: string },
+) {
+  const { hashedPassword } = await hashPassword(email, password, kdfConfig);
+
+  await request<void, unknown>(
+    http,
+    getURL(baseUrl, '/api/two-factor/send-email-login'),
+    headers,
+    POST,
+    {
+      authRequestAccessCode: '',
+      authRequestId: '',
+      deviceIdentifier: deviceIdentifier,
+      email,
+      masterPasswordHash: hashedPassword,
+      ssoEmail2FaSessionToken: '',
+    },
+  );
+}
+
+export default { prelogin, login, refreshToken, sendEmailLogin };
