@@ -133,7 +133,7 @@ export default function Login({
                 id="otp"
                 autoComplete="off"
                 value={newDeviceOtp}
-                placeholder="XXXXXX"
+                placeholder="One-time code"
                 autoFocus={true}
                 required={true}
                 className={deviceOtpIsInvalid ? 'invalid' : ''}
