@@ -101,7 +101,6 @@ export default function LoginPage() {
                   setEmail('');
                   setPassword('');
                   setTwoFactorProviders([]);
-                  // setTwoFactorType(TwoFactorAuthProvider.None);
 
                   if (ctx.server.isEmpty()) {
                     navigate('/auth');

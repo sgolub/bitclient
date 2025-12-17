@@ -4,7 +4,6 @@ import log from 'electron-log';
 import useApplicationContext from '@renderer/hooks/useApplicationContext';
 import useLoadingCallback from '@renderer/hooks/useLoadingCallback';
 import { prelogin } from '@renderer/services/account';
-// import BitwardenServer from '@bitclient/common/types/BitwardenServer';
 import Spin from '../common/icons/spin';
 import WrongServer from './wrongServer';
 import { toErrorMessage } from '../common/utils';
@@ -12,11 +11,9 @@ import { toErrorMessage } from '../common/utils';
 const { RENDERER_VITE_DEFAULT_EMAIL } = import.meta.env;
 
 export default function Prelogin({
-  // server: _server,
   goToLogin,
   goBack,
 }: {
-  // server: BitwardenServer;
   goToLogin: (email: string) => void;
   goBack: () => void;
 }) {

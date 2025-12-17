@@ -8,7 +8,6 @@ import Mobile from '../common/icons/mobile';
 import Key from '../common/icons/key';
 import NotYou from './notYou';
 import Envelope from '../common/icons/envelope';
-// import ServerInfo from './server';
 
 export default function ChooseTwoFactor({
   email,

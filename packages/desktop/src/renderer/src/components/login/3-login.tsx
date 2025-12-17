@@ -15,12 +15,10 @@ const { RENDERER_VITE_DEFAULT_PASSWORD } = import.meta.env;
 
 export default function Login({
   email,
-  // server: _server,
   goToChooseTwoFactor,
   goBack,
 }: {
   email: string;
-  // server: BitwardenServer;
   goToChooseTwoFactor: (password: string, providers: TwoFactorAuthProvider[]) => void;
   goBack: () => void;
 }) {

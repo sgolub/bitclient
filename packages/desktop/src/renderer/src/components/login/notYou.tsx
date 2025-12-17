@@ -1,8 +1,4 @@
-// import useApplicationContext from '@renderer/hooks/useApplicationContext';
-
 export default function NotYou({ email, goBack }: { email: string; goBack: () => void }) {
-  // const { ctx } = useApplicationContext();
-
   return (
     <>
       <label>

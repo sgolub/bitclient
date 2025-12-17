@@ -83,7 +83,7 @@ export default function TwoFactor({
   }, [ctx, goBack]);
 
   useEffect(() => {
-    log.info('Submitting 2FA of type:', twoFactorType);
+    log.info('Setting up 2FA of type:', twoFactorType);
     switch (twoFactorType) {
       case TwoFactorAuthProvider.Email:
         sendEmailLogin({
