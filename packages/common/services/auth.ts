@@ -7,6 +7,7 @@ import { hashPassword } from '../utils/crypto/auth';
 import { AesCbc256_HmacSha256, AesCbc256_HmacSha256_Encrypt } from '../utils/crypto/aes';
 import { fromStringToUint8Array, fromUint8ArrayToB64 } from '../utils/string';
 import { sha256 } from 'hash-wasm';
+import { LoginResponse, LoginResponseTwoFactorAuth, TwoFactorAuthProvider } from '../types/auth';
 
 export const prelogin: Service<{ email: string; ctx: ApplicationContextJSON }, void> =
   async function ({ http, db }, { email, ctx: ctxJSON }) {
@@ -28,9 +29,17 @@ export const prelogin: Service<{ email: string; ctx: ApplicationContextJSON }, v
   };
 
 export const login: Service<
-  { email: string; password: string; ctx: ApplicationContextJSON },
-  AccountViewModel
-> = async function ({ http, db }, { email, password, ctx: ctxJSON }) {
+  {
+    email: string;
+    password: string;
+    newDeviceOtp?: string;
+    twoFactor?: { token: string; provider: string; remember: boolean };
+    ctx: ApplicationContextJSON;
+  },
+  | { twoFactor: false; account: AccountViewModel; unknownDevice: false }
+  | { twoFactor: true; providers: TwoFactorAuthProvider[]; unknownDevice: false }
+  | { twoFactor: false; unknownDevice: true }
+> = async function ({ http, db }, { email, password, newDeviceOtp, twoFactor, ctx: ctxJSON }) {
   const ctx = ApplicationContext.fromJSON(ctxJSON);
   let account = await db.getAccount(email);
 
@@ -40,7 +49,7 @@ export const login: Service<
 
   const kdfConfig = account.kdf;
 
-  const { response, userKey } = await api.login(
+  const { twoFactorAuth, deviceError, response, userKey } = await api.login(
     http,
     {
       baseUrl: ctx.server.url,
@@ -54,20 +63,41 @@ export const login: Service<
       deviceName: ctx.device.deviceName,
       deviceType: ctx.device.deviceType,
       deviceIdentifier: ctx.device.deviceIdentifier,
+      newDeviceOtp,
+      twoFactor: twoFactor ? { ...twoFactor } : undefined,
     },
   );
 
+  if (twoFactorAuth) {
+    let res = response as LoginResponseTwoFactorAuth;
+
+    return {
+      twoFactor: true,
+      providers: res.TwoFactorProviders,
+      unknownDevice: false,
+    };
+  }
+
+  if (deviceError) {
+    return {
+      twoFactor: false,
+      unknownDevice: true,
+    };
+  }
+
+  let res = response as LoginResponse;
+
   account.kdf =
-    response.Kdf === 1
+    res.Kdf === 1
       ? {
           kdf: 1,
-          kdfIterations: response.KdfIterations as number,
-          kdfMemory: response.KdfMemory as number,
-          kdfParallelism: response.KdfParallelism as number,
+          kdfIterations: res.KdfIterations as number,
+          kdfMemory: res.KdfMemory as number,
+          kdfParallelism: res.KdfParallelism as number,
         }
       : {
           kdf: 0,
-          kdfIterations: response.KdfIterations as number,
+          kdfIterations: res.KdfIterations as number,
           kdfMemory: null,
           kdfParallelism: null,
         };
@@ -77,8 +107,8 @@ export const login: Service<
   const emailHash = fromUint8ArrayToB64(fromStringToUint8Array(await sha256(email)).slice(0, 16));
 
   const { accessToken, refreshToken } = await encryptTokens(
-    response.access_token,
-    response.refresh_token,
+    res.access_token,
+    res.refresh_token,
     emailHash,
     userKey,
   );
@@ -87,17 +117,21 @@ export const login: Service<
     email,
     keys: {
       accessToken,
-      expiresIn: new Date(response.expires_in),
-      tokenType: response.token_type,
+      expiresIn: new Date(res.expires_in),
+      tokenType: res.token_type,
       refreshToken,
-      privateKey: response.PrivateKey,
-      key: response.Key,
+      privateKey: res.PrivateKey,
+      key: res.Key,
       organizationKeys: {},
     },
   });
   await db.addUserKey({ email, userKey });
 
-  return toAccountViewModel(account);
+  return {
+    twoFactor: false,
+    account: toAccountViewModel(account),
+    unknownDevice: false,
+  };
 };
 
 export const lock: Service<{ email?: string }, void> = async function ({ db }, { email }) {
@@ -183,6 +217,30 @@ export const logout: Service<{ email: string }, void> = async function ({ db }, 
   await db.deleteVault(email);
   await db.deleteKeys(email);
   await db.deleteAccount(email);
+};
+
+export const sendEmailLogin: Service<
+  { email: string; password: string; ctx: ApplicationContextJSON },
+  void
+> = async function ({ http, db }, { email, password, ctx: ctxJSON }) {
+  const ctx = ApplicationContext.fromJSON(ctxJSON);
+  let account = await db.getAccount(email);
+
+  if (!account) {
+    throw new Error('Account not found ⛔');
+  }
+
+  const kdfConfig = account.kdf;
+
+  await api.sendEmailLogin(
+    http,
+    {
+      baseUrl: ctx.server.url,
+      headers: ctx.getServerMandatoryHeaders(),
+      kdfConfig,
+    },
+    { email, password, deviceIdentifier: ctx.device.deviceIdentifier },
+  );
 };
 
 async function encryptTokens(

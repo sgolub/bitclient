@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent, app, powerMonitor } from 'electron/main';
 import { clipboard } from 'electron/common';
-import { login, prelogin, lock, logout, unlock } from '@bitclient/common/services/auth';
+import { login, prelogin, lock, logout, unlock, sendEmailLogin } from '@bitclient/common/services/auth';
 import { getSecret, sync } from '@bitclient/common/services/vault';
 import Service from '@bitclient/common/types/Service';
 import Injections from '@bitclient/common/types/Injections';
@@ -35,6 +35,7 @@ const SERVICEs: { [name: string]: Service<any, any> } = {
   lock,
   logout,
   unlock,
+  sendEmailLogin,
 };
 
 const INJECTIONs: Injections = {

@@ -2,19 +2,25 @@ import { DeviceInfo } from './ApplicationContext.js';
 
 export default class BitwardenServer {
   displayName: string;
-  desciption: string;
+  description: string;
   url: string;
   userAgent: string;
 
   constructor(displayName: string, desciption: string, url: string, userAgent: string) {
     this.displayName = displayName;
-    this.desciption = desciption;
+    this.description = desciption;
     this.url = url;
     this.userAgent = userAgent;
   }
 
   static empty(): BitwardenServer {
     return new BitwardenServer('', '', '', '');
+  }
+
+  isEmpty(): boolean {
+    return (
+      this.displayName === '' && this.description === '' && this.url === '' && this.userAgent === ''
+    );
   }
 
   getMandatoryHeaders({ deviceType, clientId }: DeviceInfo): Record<string, string | string[]> {

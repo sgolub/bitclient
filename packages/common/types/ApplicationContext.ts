@@ -92,7 +92,7 @@ export default class ApplicationContext {
       },
       server: {
         displayName: this.server.displayName,
-        desciption: this.server.desciption,
+        desciption: this.server.description,
         url: this.server.url,
         userAgent: this.server.userAgent,
       },
