@@ -25,36 +25,37 @@ export default function TwoFactor({
   const [isLoading, setIsLoading] = useState(false);
   const [otpIsInvalid, setOtpIsInvalid] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isUnsupported, setIsUnsupported] = useState(false);
   const otpInput = useRef<HTMLInputElement>(null);
 
   const { ctx, updateContext } = useApplicationContext();
+  const isSupportedTwoFactorType = useCallback((type: TwoFactorAuthProvider): boolean => {
+    return type === TwoFactorAuthProvider.TOTP; // || type === TwoFactorAuthProvider.Email;
+  }, []);
+
   const onTwoFactorVerification = useLoadingCallback(
     async function (): Promise<void> {
       try {
         setErrorMessage('');
         setIsLoading(true);
-        let loginRequest: ReturnType<typeof login>;
-        switch (twoFactorType) {
-          case TwoFactorAuthProvider.TOTP:
-          case TwoFactorAuthProvider.Email:
-            log.info('Submitting 2FA of code:', otp);
-            loginRequest = login({
-              email,
-              password,
-              twoFactor: {
-                token: otp,
-                provider: twoFactorType,
-                remember: false,
-              },
-              ctx,
-            });
-            break;
-          case TwoFactorAuthProvider.Passkey:
-          case TwoFactorAuthProvider.Yubikey:
-          case TwoFactorAuthProvider.Duo:
-          default:
-            throw new Error('Unsupported two-factor authentication type');
+
+        if (!isSupportedTwoFactorType(twoFactorType)) {
+          throw new Error(
+            'This two-factor authentication method is not yet supported. Please try another authentication method.',
+          );
         }
+
+        log.info('Submitting 2FA of code:', otp);
+        const loginRequest = login({
+          email,
+          password,
+          twoFactor: {
+            token: otp,
+            provider: twoFactorType as string,
+            remember: false,
+          },
+          ctx,
+        });
 
         const res = await loginRequest;
 
@@ -73,7 +74,7 @@ export default function TwoFactor({
         setIsLoading(false);
       }
     },
-    [email, ctx, otp, password, twoFactorType, updateContext],
+    [email, ctx, otp, password, twoFactorType, updateContext, isSupportedTwoFactorType],
   );
 
   const resetServer = useCallback(() => {
@@ -84,6 +85,21 @@ export default function TwoFactor({
 
   useEffect(() => {
     log.info('Setting up 2FA of type:', twoFactorType);
+
+    // Check if the 2FA type is supported
+    if (!isSupportedTwoFactorType(twoFactorType)) {
+      const unsupportedMessage =
+        'This two-factor authentication method is not yet supported. Please try another authentication method.';
+      log.warn('Unsupported 2FA type:', twoFactorType);
+      setErrorMessage(unsupportedMessage);
+      setIsUnsupported(true);
+      return;
+    }
+
+    // Reset unsupported state if switching to a supported type
+    setIsUnsupported(false);
+    setErrorMessage('');
+
     switch (twoFactorType) {
       case TwoFactorAuthProvider.Email:
         sendEmailLogin({
@@ -109,56 +125,69 @@ export default function TwoFactor({
         // No action required for unsupported/none providers on mount
         break;
     }
-  }, [twoFactorType, ctx, email, password]);
+  }, [twoFactorType, ctx, email, password, isSupportedTwoFactorType]);
 
   return (
     <>
-      <form
-        className="login-form"
-        noValidate={true}
-        onSubmit={(e) => {
-          e.preventDefault();
-          onTwoFactorVerification();
-        }}
-      >
-        <div className="form-row">
-          <NotYou email={email} goBack={goBack} />
-        </div>
-        <div className="form-row">{description(twoFactorType, { email })}</div>
-        <div className="form-row">
-          <input
-            type="text"
-            name="otp"
-            id="otp"
-            ref={otpInput}
-            autoComplete="off"
-            value={otp}
-            placeholder="One-time code"
-            autoFocus={true}
-            required={true}
-            className={otpIsInvalid ? 'invalid' : ''}
-            onChange={(e) => setOtp(e.target.value)}
-          />
-        </div>
-        <div className="form-row">
-          {!isLoading && (
-            <button type="submit" disabled={!otp} className="btn">
-              Continue
-            </button>
-          )}
-          {isLoading && (
-            <button type="button" disabled={true} className="btn loading">
-              <Spin className="loading-spinner" />
-              Loading...
-            </button>
-          )}
-        </div>
-        {errorMessage && (
+      {isUnsupported ? (
+        <>
           <div className="form-row">
             <p className="error-message">{errorMessage}</p>
           </div>
-        )}
-      </form>
+          <div className="form-row">
+            <button type="button" className="btn" onClick={goBack}>
+              Try another method
+            </button>
+          </div>
+        </>
+      ) : (
+        <form
+          className="login-form"
+          noValidate={true}
+          onSubmit={(e) => {
+            e.preventDefault();
+            onTwoFactorVerification();
+          }}
+        >
+          <div className="form-row">
+            <NotYou email={email} goBack={goBack} />
+          </div>
+          <div className="form-row">{description(twoFactorType, { email })}</div>
+          <div className="form-row">
+            <input
+              type="text"
+              name="otp"
+              id="otp"
+              ref={otpInput}
+              autoComplete="off"
+              value={otp}
+              placeholder="One-time code"
+              autoFocus={true}
+              required={true}
+              className={otpIsInvalid ? 'invalid' : ''}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+          </div>
+          <div className="form-row">
+            {!isLoading && (
+              <button type="submit" disabled={!otp} className="btn">
+                Continue
+              </button>
+            )}
+            {isLoading && (
+              <button type="button" disabled={true} className="btn loading">
+                <Spin className="loading-spinner" />
+                Loading...
+              </button>
+            )}
+          </div>
+          {errorMessage && (
+            <div className="form-row">
+              <p className="error-message">{errorMessage}</p>
+            </div>
+          )}
+        </form>
+      )}
       <WrongServer reset={resetServer} />
     </>
   );

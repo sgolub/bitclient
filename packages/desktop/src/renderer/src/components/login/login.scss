@@ -127,6 +127,7 @@
 .error-message {
   color: var(--color-invalid);
   font-size: small;
+  max-width: 20rem;
 }
 
 @keyframes spin {
