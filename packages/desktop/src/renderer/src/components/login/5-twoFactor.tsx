@@ -30,7 +30,7 @@ export default function TwoFactor({
 
   const { ctx, updateContext } = useApplicationContext();
   const isSupportedTwoFactorType = useCallback((type: TwoFactorAuthProvider): boolean => {
-    return type === TwoFactorAuthProvider.TOTP; // || type === TwoFactorAuthProvider.Email;
+    return type === TwoFactorAuthProvider.TOTP || type === TwoFactorAuthProvider.Email;
   }, []);
 
   const onTwoFactorVerification = useLoadingCallback(
